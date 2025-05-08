@@ -42,19 +42,18 @@ if [ -z "$upload_files" ]; then
     exit 1
 fi
 
+
+#### Listar todos os arquivos para envio em lotes ####
+file_list=$(find "$LOCAL_DIR" -type f)
+if [ -z "$file_list" ]; then
+    log_error "Nenhum arquivo encontrado no diretório '$LOCAL_DIR'."
+    exit 0
+    else
+        log_info "Arquivos encontrados para upload: $LOCAL_DIR"
+        echo "$file_list" | xargs -n1 basename
+fi
+
 log_info "Iniciando o script de upload dos arquivos em $LOCAL_DIR ..."
 
-for file in "$LOCAL_DIR"/*; do
-    filename=$(basename "$file")
-    log_info "Processando arquivo: $filename"
-    upload_files "$file" "$filename"
-    if [ $? -ne 0 ]; then
-        log_error "Erro ao processar o arquivo: $filename"
-        exit 1
-    elif [ -f "$file" ]; then
-        log_info "Arquivo $filename já existe no bucket. Pulando o upload."
-        continue
-    else
-        log_info "Arquivo $filename enviado com sucesso."
-    fi
-done
+upload_files 
+
